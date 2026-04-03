@@ -81,7 +81,7 @@ jobs:
         mysql -h 127.0.0.1 -uroot -ppass@word1 appointment_db <<EOF
         DELETE FROM service;
 
-        INSERT INTO service (description, name, price) VALUES
+        INSERT INTO service_entity(description, name, price) VALUES
         ('Basic hair trim service','Hair Trim',150),
         ('Advanced hair cutting','Haircut Premium',300),
         ('Deep conditioning hair spa','Hair Spa Deluxe',600),
