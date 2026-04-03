@@ -1,0 +1,70 @@
+body{
+font-family: 'Segoe UI',sans-serif;
+background:#f5f6fa;
+margin:0;
+}
+
+.navbar{
+background:#111;
+padding:15px;
+}
+
+.navbar a{
+color:white;
+margin-right:20px;
+text-decoration:none;
+}
+
+.hero{
+
+height:500px;
+
+background:url("../assets/images/hero.jpg") center/cover;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+color:white;
+
+text-align:center;
+
+}
+
+.hero h1{
+font-size:48px;
+font-weight:700;
+}
+
+.service-card{
+
+border-radius:12px;
+
+box-shadow:0 10px 25px rgba(0,0,0,0.1);
+
+transition:0.3s;
+
+background:white;
+
+}
+
+.service-card:hover{
+
+transform:translateY(-10px);
+
+box-shadow:0 20px 40px rgba(0,0,0,0.2);
+
+}
+
+.btn-primary{
+background:#6c5ce7;
+border:none;
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+padding:20px;
+}

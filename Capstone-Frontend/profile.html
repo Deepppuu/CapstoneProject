@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Profile | BookEase</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body{
+background:#f5f7fb;
+font-family:'Segoe UI',sans-serif;
+}
+
+/* PROFILE CARD */
+
+.profile-card{
+background:white;
+padding:30px;
+border-radius:12px;
+box-shadow:0 5px 20px rgba(0,0,0,0.08);
+}
+
+/* PROFILE IMAGE */
+
+.profile-img{
+width:100px;
+height:100px;
+border-radius:50%;
+background:#6c5ce7;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+font-size:40px;
+font-weight:bold;
+margin:auto;
+}
+
+/* TITLE */
+
+.profile-title{
+text-align:center;
+margin-top:15px;
+font-weight:600;
+}
+
+/* PROFILE ROW */
+
+.profile-row{
+display:flex;
+justify-content:space-between;
+padding:12px 0;
+border-bottom:1px solid #eee;
+}
+
+.profile-label{
+font-weight:600;
+color:#555;
+}
+
+.profile-value{
+color:#333;
+}
+
+/* BUTTON */
+
+.logout-btn{
+width:100%;
+padding:12px;
+font-weight:600;
+border:none;
+border-radius:10px;
+background:#ff5c5c;
+color:white;
+margin-top:20px;
+}
+
+.logout-btn:hover{
+background:#e04848;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- ✅ NAVBAR -->
+<div id="navbar"></div>
+
+<div class="container mt-5">
+
+<div class="row justify-content-center">
+
+<div class="col-md-6">
+
+<div class="profile-card">
+
+<div class="profile-img" id="profileInitial">
+U
+</div>
+
+<h4 class="profile-title">My Profile</h4>
+
+<div class="mt-4">
+
+<div class="profile-row">
+<span class="profile-label">User ID</span>
+<span class="profile-value" id="userId"></span>
+</div>
+
+<div class="profile-row">
+<span class="profile-label">Name</span>
+<span class="profile-value" id="name"></span>
+</div>
+
+<div class="profile-row">
+<span class="profile-label">Email</span>
+<span class="profile-value" id="email"></span>
+</div>
+
+<div class="profile-row">
+<span class="profile-label">Account Status</span>
+<span class="profile-value text-success">Active</span>
+</div>
+
+<button class="logout-btn" onclick="logout()">
+Logout
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const API="http://localhost:8081/api";
+
+const userId=localStorage.getItem("userId");
+
+/* REDIRECT IF NOT LOGGED IN */
+
+if(!userId){
+
+alert("Please login first");
+
+window.location.href="login.html";
+
+}
+
+/* LOAD PROFILE */
+
+async function loadProfile(){
+
+try{
+
+const res=await fetch(`${API}/users/${userId}`);
+
+const result=await res.json();
+
+const user=result.data;
+
+document.getElementById("userId").innerText=user.id;
+
+document.getElementById("name").innerText=user.name;
+
+document.getElementById("email").innerText=user.email;
+
+document.getElementById("profileInitial").innerText=user.name.charAt(0).toUpperCase();
+
+}catch(err){
+
+console.error(err);
+
+alert("Failed to load profile");
+
+}
+
+}
+
+/* LOGOUT FUNCTION */
+
+function logout(){
+
+localStorage.clear();
+
+window.location.href="login.html";
+
+}
+
+/* ✅ NAVBAR LOADER */
+
+async function loadNavbar(){
+try{
+const res = await fetch("components/navbar.html");
+const html = await res.text();
+document.getElementById("navbar").innerHTML = html;
+}catch(e){
+console.error("Navbar load failed", e);
+}
+}
+
+/* RUN */
+
+loadNavbar();
+loadProfile();
+
+</script>
+
+</body>
+
+</html>
