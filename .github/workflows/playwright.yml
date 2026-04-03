@@ -74,14 +74,19 @@ jobs:
         nohup ./mvnw spring-boot:run &
         sleep 40
 
-    # ⭐ NEW STEP — Insert services into database
+    - name: Wait for Backend
+      run: npx wait-on tcp:8081
+
+    # Seed database AFTER backend starts so tables exist
     - name: Seed Service Data
       run: |
-        sudo apt-get install mysql-client
+        sudo apt-get update
+        sudo apt-get install -y mysql-client
         mysql -h 127.0.0.1 -uroot -ppass@word1 appointment_db <<EOF
-        DELETE FROM service;
 
-        INSERT INTO service_entity(description, name, price) VALUES
+        DELETE FROM service_entity;
+
+        INSERT INTO service_entity (description, name, price) VALUES
         ('Basic hair trim service','Hair Trim',150),
         ('Advanced hair cutting','Haircut Premium',300),
         ('Deep conditioning hair spa','Hair Spa Deluxe',600),
@@ -102,15 +107,13 @@ jobs:
         ('Eyebrow shaping service','Eyebrow Shaping',120),
         ('Hair wash and blow dry','Hair Wash',200),
         ('Professional party hairstyle','Party Hairstyle',900);
+
         EOF
 
     - name: Start Frontend
       run: |
         npx serve Capstone-Frontend -l 5500 &
         sleep 10
-
-    - name: Wait for Backend
-      run: npx wait-on tcp:8081
 
     - name: Run Playwright Tests
       run: npm run test:ci -- --shard=${{ matrix.shard_index }}/3
