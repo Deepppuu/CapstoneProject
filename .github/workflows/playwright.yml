@@ -3,59 +3,54 @@ name: Playwright CI
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
-      # Checkout repository
-      - name: Checkout code
-        uses: actions/checkout@v4
 
-      # Setup Node.js
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      # Install Node dependencies
-      - name: Install dependencies
-        run: npm ci
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
 
-      # Install Playwright browsers
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+    - name: Install dependencies
+      run: npm ci
 
-      # Setup Java for Spring Boot
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
 
-      # Start Spring Boot backend
-      - name: Start backend
-        run: |
-          cd online-booking
-          ./mvnw spring-boot:run &
-      
-      # Wait until backend is ready
-      - name: Wait for backend
-        run: npx wait-on http://localhost:8080
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 17
 
-      # Run Playwright tests
-      - name: Run Playwright tests
-        run: npx playwright test
+    - name: Build backend
+      run: |
+        cd online-booking
+        ./mvnw clean install -DskipTests
 
-      # Upload Playwright HTML report
-      - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
+    - name: Start backend
+      run: |
+        cd online-booking
+        nohup ./mvnw spring-boot:run &
+        sleep 30
+
+    - name: Wait for backend
+      run: npx wait-on http://localhost:8081
+
+    - name: Run Playwright tests
+      run: npx playwright test
+
+    - name: Upload Playwright report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
