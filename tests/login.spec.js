@@ -103,6 +103,8 @@ test('Login with wrong password', async ({ page }) => {
   await loginPage.openLoginPage();
 
   page.on('dialog', async dialog => {
+    // Backend may return plain-text or JSON; frontend shows either
+    // "Invalid credentials" (parsed JSON) or "Server error" (parse failure)
     expect(
       dialog.message().includes("Invalid credentials") ||
       dialog.message().includes("Server error")
