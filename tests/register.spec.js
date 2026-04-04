@@ -1,6 +1,22 @@
 const { test, expect } = require('@playwright/test');
 const RegisterPage = require('../pages/RegisterPage');
 
+test.setTimeout(60000);
+
+/* Handle dialogs globally */
+
+test.beforeEach(async ({ page }) => {
+
+page.on('dialog', async dialog => {
+
+console.log("Dialog:", dialog.message());
+
+await dialog.accept();
+
+});
+
+});
+
 /* Register with valid details */
 
 test('Register with valid details', async ({ page }) => {
@@ -9,25 +25,23 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
+const email = `user${Date.now()}@test.com`;
 
-const msg = dialog.message();
-
-expect(
-msg.includes("Registration Successful") ||
-msg.includes("Server error")
-).toBeTruthy();
-
-await dialog.accept();
-
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 'Deepika',
-'Deepika@gmail.com',
+email,
 'Deepika123',
 'Deepika123'
 );
+
+const dialog = await dialogPromise;
+
+expect(
+dialog.message().includes("Registration Successful") ||
+dialog.message().includes("Server error")
+).toBeTruthy();
 
 });
 
@@ -40,10 +54,7 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
-expect(dialog.message()).toContain("Please fill all fields");
-await dialog.accept();
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 '',
@@ -51,6 +62,10 @@ await registerPage.register(
 'EmptyName123',
 'EmptyName123'
 );
+
+const dialog = await dialogPromise;
+
+expect(dialog.message()).toContain("Please fill all fields");
 
 });
 
@@ -63,10 +78,7 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
-expect(dialog.message()).toContain("Please fill all fields");
-await dialog.accept();
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 'Test User',
@@ -74,6 +86,10 @@ await registerPage.register(
 '123456',
 '123456'
 );
+
+const dialog = await dialogPromise;
+
+expect(dialog.message()).toContain("Please fill all fields");
 
 });
 
@@ -86,10 +102,7 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
-expect(dialog.message()).toContain("Please fill all fields");
-await dialog.accept();
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 'Test User',
@@ -97,6 +110,10 @@ await registerPage.register(
 '',
 ''
 );
+
+const dialog = await dialogPromise;
+
+expect(dialog.message()).toContain("Please fill all fields");
 
 });
 
@@ -109,10 +126,7 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
-expect(dialog.message()).toContain("Please fill all fields");
-await dialog.accept();
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 'Test User',
@@ -120,6 +134,10 @@ await registerPage.register(
 '123456',
 ''
 );
+
+const dialog = await dialogPromise;
+
+expect(dialog.message()).toContain("Please fill all fields");
 
 });
 
@@ -132,10 +150,7 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
-expect(dialog.message()).toContain("Passwords do not match");
-await dialog.accept();
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 'Test User',
@@ -143,6 +158,10 @@ await registerPage.register(
 '123456',
 '999999'
 );
+
+const dialog = await dialogPromise;
+
+expect(dialog.message()).toContain("Passwords do not match");
 
 });
 
@@ -155,10 +174,7 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
-expect(dialog.message()).toContain("Invalid email format");
-await dialog.accept();
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 'Test User',
@@ -166,6 +182,10 @@ await registerPage.register(
 '123456',
 '123456'
 );
+
+const dialog = await dialogPromise;
+
+expect(dialog.message()).toContain("Invalid email format");
 
 });
 
@@ -178,10 +198,7 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
-expect(dialog.message()).toContain("Name must contain only letters");
-await dialog.accept();
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 '@@@Test###',
@@ -189,6 +206,10 @@ await registerPage.register(
 '123456',
 '123456'
 );
+
+const dialog = await dialogPromise;
+
+expect(dialog.message()).toContain("Name must contain only letters");
 
 });
 
@@ -201,10 +222,7 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
-expect(dialog.message()).toContain("Name must contain only letters");
-await dialog.accept();
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 'A',
@@ -212,6 +230,10 @@ await registerPage.register(
 '123456',
 '123456'
 );
+
+const dialog = await dialogPromise;
+
+expect(dialog.message()).toContain("Name must contain only letters");
 
 });
 
@@ -224,10 +246,7 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
-expect(dialog.message()).toContain("Name must contain only letters");
-await dialog.accept();
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -235,6 +254,10 @@ await registerPage.register(
 '123456',
 '123456'
 );
+
+const dialog = await dialogPromise;
+
+expect(dialog.message()).toContain("Name must contain only letters");
 
 });
 
@@ -247,10 +270,7 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
-expect(dialog.message()).toContain("Password must be at least 6 characters long");
-await dialog.accept();
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 'Test User',
@@ -258,6 +278,10 @@ await registerPage.register(
 '12',
 '12'
 );
+
+const dialog = await dialogPromise;
+
+expect(dialog.message()).toContain("Password must be at least 6 characters long");
 
 });
 
@@ -270,10 +294,7 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
-expect(dialog.message()).toContain("Invalid email format");
-await dialog.accept();
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 'Test User',
@@ -281,6 +302,10 @@ await registerPage.register(
 '123456',
 '123456'
 );
+
+const dialog = await dialogPromise;
+
+expect(dialog.message()).toContain("Invalid email format");
 
 });
 
@@ -293,25 +318,23 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
+const email = `user${Date.now()}@test.com`;
 
-const msg = dialog.message();
-
-expect(
-msg.includes("Registration Successful") ||
-msg.includes("Server error")
-).toBeTruthy();
-
-await dialog.accept();
-
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 'Test User',
-'test.user@gmail.com',
+email,
 '123456',
 '123456'
 );
+
+const dialog = await dialogPromise;
+
+expect(
+dialog.message().includes("Registration Successful") ||
+dialog.message().includes("Server error")
+).toBeTruthy();
 
 });
 
@@ -324,25 +347,23 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
+const email = `user${Date.now()}@test.com`;
 
-const msg = dialog.message();
-
-expect(
-msg.includes("Registration Successful") ||
-msg.includes("Server error")
-).toBeTruthy();
-
-await dialog.accept();
-
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 'Prem Kumar',
-'test14@gmail.com',
+email,
 '123456',
 '123456'
 );
+
+const dialog = await dialogPromise;
+
+expect(
+dialog.message().includes("Registration Successful") ||
+dialog.message().includes("Server error")
+).toBeTruthy();
 
 });
 
@@ -355,10 +376,7 @@ const registerPage = new RegisterPage(page);
 
 await registerPage.openRegisterPage();
 
-page.once('dialog', async dialog => {
-expect(dialog.message()).toContain("Please fill all fields");
-await dialog.accept();
-});
+const dialogPromise = page.waitForEvent("dialog");
 
 await registerPage.register(
 '',
@@ -366,5 +384,9 @@ await registerPage.register(
 '',
 ''
 );
+
+const dialog = await dialogPromise;
+
+expect(dialog.message()).toContain("Please fill all fields");
 
 });
