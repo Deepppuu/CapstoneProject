@@ -23,22 +23,23 @@ this.cancelBtn = page.locator(".cancel-btn");
 async navigate(){
 
 await this.page.goto(
-`${BASE_URL}/booking.html?serviceId=1&slotId=1`,
-{ waitUntil: "domcontentloaded" }
+"http://127.0.0.1:5500/booking.html?serviceId=1&slotId=1"
 );
 
-/* wait for booking card */
-await this.page.waitForSelector(".booking-card");
+/* ensure localStorage exists before page loads */
 
-/* wait until service name is filled */
-await this.page.waitForFunction(() => {
-const name = document.querySelector("#serviceName")?.textContent;
-return name && name.trim() !== "";
+await this.page.evaluate(() => {
+localStorage.setItem("userId","1");
+localStorage.setItem("bookingDate","2026-04-05");
 });
 
-/* wait for slot and price */
-await this.page.waitForSelector("#slotTime");
-await this.page.waitForSelector("#price");
+/* reload page after storage set */
+
+await this.page.reload();
+
+/* wait for booking card */
+
+await this.page.waitForSelector(".booking-card",{timeout:15000});
 
 }
 
