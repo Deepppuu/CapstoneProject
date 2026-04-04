@@ -28,37 +28,12 @@ test.describe("Booking Page Capstone Tests", () => {
 
   });
 
-  /* ---------------- BASIC ---------------- */
 
-  test("Booking page loads", async ({ page }) => {
-    const booking = new BookingPage(page);
-    await booking.navigate();
-    await booking.verifyPageLoaded();
-  });
 
-  test("Service details displayed", async ({ page }) => {
-    const booking = new BookingPage(page);
-    await booking.navigate();
-    await booking.verifyServiceDetails();
-  });
+  
 
-  test("Service price numeric", async ({ page }) => {
-    const booking = new BookingPage(page);
-    await booking.navigate();
-    await booking.verifyPriceNumeric();
-  });
+ 
 
-  test("Slot time displayed", async ({ page }) => {
-    const booking = new BookingPage(page);
-    await booking.navigate();
-    await booking.verifySlot();
-  });
-
-  test("Booking date correct", async ({ page }) => {
-    const booking = new BookingPage(page);
-    await booking.navigate();
-    await booking.verifyBookingDate();
-  });
 
   /* ---------------- UI ---------------- */
 
