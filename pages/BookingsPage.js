@@ -21,10 +21,15 @@ this.payBtn = page.locator("button:has-text('Pay Now')");
 /* NAVIGATION */
 
 async navigate(){
-  await this.page.goto(
-    "http://127.0.0.1:5500/Capstone-Frontend/bookings.html",
-    { waitUntil: "domcontentloaded" }
-  );
+
+await this.page.goto(
+"http://127.0.0.1:5500/bookings.html",
+{ waitUntil: "domcontentloaded" }
+);
+
+/* wait for page to load */
+await this.page.waitForSelector("#bookingList");
+
 }
 
 /* VALIDATIONS */
