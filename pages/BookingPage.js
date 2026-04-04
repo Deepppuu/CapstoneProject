@@ -23,7 +23,7 @@ this.cancelBtn = page.locator(".cancel-btn");
 async navigate(){
 
 await this.page.goto(
-"http://127.0.0.1:5500/Capstone-Frontend/booking.html?serviceId=1&slotId=1",
+`${BASE_URL}/booking.html?serviceId=1&slotId=1`,
 { waitUntil: "domcontentloaded" }
 );
 
