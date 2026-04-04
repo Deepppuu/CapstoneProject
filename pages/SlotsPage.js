@@ -14,18 +14,31 @@ this.slots = page.locator(".slot");
 this.confirmButton = page.locator(".confirm-btn");
 }
 
+
 /* OPEN PAGE */
 
 async open(){
-await this.page.goto("http://127.0.0.1:5500/Capstone-Frontend/slots.html?serviceId=1");
+
+await this.page.goto(
+  "http://127.0.0.1:5500/Capstone-Frontend/slots.html?serviceId=1"
+);
+
 }
+
 
 /* WAIT FOR PAGE */
 
 async waitForPage(){
-await this.serviceInfo.waitFor({ state: "visible" });
-await this.page.waitForTimeout(2000); // stable wait
+
+await this.page.waitForLoadState("networkidle");
+
+await this.serviceInfo.waitFor({
+  state: "visible",
+  timeout: 60000
+});
+
 }
+
 
 /* SLOT COUNT */
 
@@ -33,27 +46,37 @@ async getSlotCount(){
 return await this.slots.count();
 }
 
+
 /* SLOT TEXT */
 
 async getAllSlotsText(){
 return await this.slots.allTextContents();
 }
 
+
 /* SELECT SLOT */
 
 async selectFirstSlot(){
+
 const count = await this.getSlotCount();
+
 if(count > 0){
 await this.slots.first().click();
 }
+
 }
 
+
 async selectLastSlot(){
+
 const count = await this.getSlotCount();
+
 if(count > 0){
 await this.slots.last().click();
 }
+
 }
+
 
 /* DATE */
 
@@ -65,10 +88,15 @@ async getMinDate(){
 return await this.dateInput.getAttribute("min");
 }
 
+
 /* CLEAR LOGIN */
 
 async clearLogin(){
-await this.page.evaluate(() => localStorage.clear());
+
+await this.page.evaluate(() => {
+localStorage.clear();
+});
+
 }
 
 }
