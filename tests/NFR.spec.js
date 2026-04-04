@@ -2,16 +2,15 @@ const { test, expect } = require('@playwright/test');
 
 test.setTimeout(60000);
 
-const LOGIN_URL = "http://127.0.0.1:5500/Capstone-Frontend/login.html";
-const BOOKING_URL = "http://127.0.0.1:5500/Capstone-Frontend/booking.html";
-const SERVICES_URL = "http://127.0.0.1:5500/Capstone-Frontend/services.html";
+const LOGIN_URL = "http://127.0.0.1:5500/login.html";
+const BOOKING_URL = "http://127.0.0.1:5500/booking.html";
+const SERVICES_URL = "http://127.0.0.1:5500/services.html";
 
 test.describe("NFR Tests", () => {
 
 test.beforeEach(async ({ page }) => {
 
 await page.addInitScript(()=>{
-localStorage.setItem("userId","1");
 localStorage.setItem("bookingDate","2026-04-05");
 });
 
@@ -74,6 +73,10 @@ test("SQL Injection should fail", async ({ page }) => {
 
 await page.goto(LOGIN_URL,{waitUntil:"domcontentloaded"});
 
+page.once("dialog", async dialog=>{
+await dialog.accept();
+});
+
 await page.fill("#email","' OR '1'='1");
 await page.fill("#password","123");
 
@@ -87,6 +90,10 @@ await expect(page).toHaveURL(/login/);
 test("Invalid login should stay on login page", async ({ page }) => {
 
 await page.goto(LOGIN_URL,{waitUntil:"domcontentloaded"});
+
+page.once("dialog", async dialog=>{
+await dialog.accept();
+});
 
 await page.fill("#email","fakeuser@gmail.com");
 await page.fill("#password","wrongpass");
