@@ -12,7 +12,7 @@ await page.addInitScript(() => {
   localStorage.setItem("userId","1");
 });
 
-// Open services page before every test
+// open services page
 await servicesPage.openServicesPage();
 
 });
@@ -184,7 +184,7 @@ const servicesPage = new ServicesPage(page);
 
 await servicesPage.clickBookButton(0);
 
-await expect(page).toHaveURL(/slots.html/);
+await expect(page).toHaveURL(/slots/);
 
 });
 
@@ -196,7 +196,7 @@ const servicesPage = new ServicesPage(page);
 
 await servicesPage.clickBookButton(0);
 
-await page.waitForURL(/slots.html/);
+await page.waitForURL(/slots/);
 
 const url = page.url();
 
@@ -222,7 +222,7 @@ const servicesPage = new ServicesPage(page);
 
 await servicesPage.navHome.click();
 
-await expect(page).toHaveURL(/index.html/);
+await expect(page).toHaveURL(/\/$/);
 
 });
 
@@ -244,7 +244,7 @@ const servicesPage = new ServicesPage(page);
 
 await servicesPage.navBookings.click();
 
-await expect(page).toHaveURL(/bookings.html/);
+await expect(page).toHaveURL(/bookings/);
 
 });
 
@@ -256,7 +256,7 @@ const servicesPage = new ServicesPage(page);
 
 await servicesPage.navProfile.click();
 
-await expect(page).toHaveURL(/profile.html/);
+await expect(page).toHaveURL(/profile/);
 
 });
 
@@ -268,7 +268,7 @@ const servicesPage = new ServicesPage(page);
 
 await servicesPage.navLogin.click();
 
-await expect(page).toHaveURL(/login.html/);
+await expect(page).toHaveURL(/login/);
 
 });
 
