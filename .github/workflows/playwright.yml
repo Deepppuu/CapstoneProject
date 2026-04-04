@@ -1,4 +1,4 @@
-name: Run Application (No Tests)
+name: Run Application
 
 on:
   workflow_dispatch:
@@ -8,6 +8,7 @@ on:
 jobs:
   run-app:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     services:
       mysql:
@@ -28,7 +29,7 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Setup Node
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 20
@@ -57,20 +58,36 @@ jobs:
     - name: Wait for Backend
       run: npx wait-on tcp:8081
 
-    - name: Seed Services
+    - name: Seed Service Data
       run: |
         sudo apt-get update
         sudo apt-get install -y mysql-client
+
         mysql -h 127.0.0.1 -uroot -ppass@word1 appointment_db <<EOF
 
         DELETE FROM service_entity;
 
         INSERT INTO service_entity(description,name,price) VALUES
-        ('Hair Trim','Hair Trim',150),
-        ('Haircut Premium','Haircut Premium',300),
-        ('Hair Spa Deluxe','Hair Spa Deluxe',600),
-        ('Beard Shave','Beard Shave',120),
-        ('Beard Style Premium','Beard Style Premium',350);
+        ('Basic hair trim service','Hair Trim',150),
+        ('Advanced hair cutting','Haircut Premium',300),
+        ('Deep conditioning hair spa','Hair Spa Deluxe',600),
+        ('Quick beard shave','Beard Shave',120),
+        ('Premium beard styling','Beard Style Premium',350),
+        ('Classic facial treatment','Facial Classic',650),
+        ('Luxury facial treatment','Facial Luxury',1200),
+        ('Professional hair coloring','Hair Color Premium',1800),
+        ('Hair highlights styling','Hair Highlights',2000),
+        ('Keratin hair treatment','Keratin Treatment',3500),
+        ('Relaxing oil head massage','Oil Head Massage',350),
+        ('Full body spa therapy','Body Spa',4000),
+        ('Luxury body massage','Body Massage',2500),
+        ('Express manicure service','Express Manicure',250),
+        ('Express pedicure service','Express Pedicure',300),
+        ('Full arm waxing treatment','Full Arm Waxing',700),
+        ('Full leg waxing treatment','Full Leg Waxing',900),
+        ('Eyebrow shaping service','Eyebrow Shaping',120),
+        ('Hair wash and blow dry','Hair Wash',200),
+        ('Professional party hairstyle','Party Hairstyle',900);
 
         EOF
 
@@ -79,7 +96,15 @@ jobs:
         npx serve Capstone-Frontend -l 5500 &
         sleep 10
 
-    - name: Check Application Health
+    - name: Check Backend API
       run: |
-        curl http://127.0.0.1:8081
-        curl http://127.0.0.1:5500
+        echo "Checking backend API..."
+        curl http://127.0.0.1:8081/api/services
+
+    - name: Check Frontend
+      run: |
+        echo "Checking frontend..."
+        curl http://127.0.0.1:5500/Capstone-Frontend/index.html
+
+    - name: Application Started Successfully
+      run: echo "Backend + Frontend + Database running successfully!"
