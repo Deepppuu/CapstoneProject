@@ -34,27 +34,28 @@ jobs:
           distribution: 'temurin'
           cache: maven
       
-      - name: Initialize Database
-        run: |
-          mysql -h 127.0.0.1 -u root -ppass@word1 appointment_db < database/seed.sql
-      
       - name: Start Backend Server
         run: |
           cd online-booking
           mvn clean install -q
-          timeout 60 mvn spring-boot:run &
-          echo "Waiting for backend to start..."
-          sleep 15
+          timeout 120 mvn spring-boot:run &
+          echo "Waiting for backend to start and create tables..."
+          sleep 20
           for i in {1..30}; do
             if curl -f http://localhost:8081/api/services > /dev/null 2>&1; then
-              echo "Backend started successfully"
-              exit 0
+              echo "Backend started successfully - tables created"
+              sleep 5
+              break
             fi
             echo "Attempt $i: Waiting for backend..."
             sleep 2
           done
-          echo "Backend failed to start"
-          exit 1
+      
+      - name: Seed Database
+        run: |
+          echo "Seeding database with test data..."
+          mysql -h 127.0.0.1 -u root -ppass@word1 appointment_db < database/seed.sql
+          echo "Database seeded successfully"
       
       - name: Set up Node
         uses: actions/setup-node@v4
