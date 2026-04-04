@@ -35,6 +35,7 @@ jobs:
       CI: true
 
     steps:
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -100,7 +101,8 @@ jobs:
           DELETE FROM service_entity;
 
           INSERT INTO \`user\` (id,name,email,password) VALUES
-          (1,'Test User','test@example.com','test123');
+          (1,'User1','user1@test.com','pass'),
+          (2,'User2','user2@test.com','pass');
 
           INSERT INTO service_entity (id,description,name,price) VALUES
           (1,'Basic hair trim service','Hair Trim',150),
@@ -125,10 +127,16 @@ jobs:
           (20,'Professional party hairstyle','Party Hairstyle',900);
 
           INSERT INTO slot (id,booked,date,time,service_id) VALUES
-          (1,0,'2026-04-05','10:00:00',1);
+          (1,0,'2026-04-05','09:00:00',1),
+          (2,0,'2026-04-05','10:00:00',1),
+          (3,0,'2026-04-05','11:00:00',1),
+          (4,0,'2026-04-05','12:00:00',1),
+          (5,0,'2026-04-05','13:00:00',1),
+          (6,0,'2026-04-05','14:00:00',1);
 
           INSERT INTO booking (id,created_time,status,slot_id,user_id) VALUES
-          (1,NOW(),'BOOKED',1,1);
+          (1,NOW(),'BOOKED',1,1),
+          (2,NOW(),'BOOKED',6,2);
 
           INSERT INTO payment (id,amount,status,booking_id) VALUES
           (1,150,'PAID',1);
