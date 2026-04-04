@@ -5,7 +5,12 @@ test.describe("Booking Page Capstone Tests", () => {
 
 test.beforeEach(async ({ page }) => {
 
+/* MOCK LOGIN STATE */
 
+await page.addInitScript(() => {
+localStorage.setItem("userId","1");
+localStorage.setItem("bookingDate","2026-04-05");
+});
 
 /* MOCK SERVICE API */
 
