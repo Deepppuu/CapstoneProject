@@ -37,25 +37,37 @@ jobs:
       - name: Start Backend Server
         run: |
           cd online-booking
+          echo "🔧 Building backend..."
           mvn clean install -q -Dmaven.test.skip=true
-          echo "Starting backend server..."
+          echo "🚀 Starting backend server..."
           timeout 120 mvn spring-boot:run &
-          echo "Waiting for backend to start and create tables..."
-          sleep 20
-          for i in {1..30}; do
-            if curl -f -s http://localhost:8081/api/services > /dev/null 2>&1; then
-              echo "✅ Backend started successfully - tables created"
-              sleep 3
-              # Test the API to make sure it's working
-              curl -s http://localhost:8081/api/services | head -c 100
-              echo ""
+          BACKEND_PID=$!
+          echo "Backend PID: $BACKEND_PID"
+          echo "⏳ Waiting for backend to start and create tables..."
+          sleep 25
+          for i in {1..40}; do
+            if curl -f -s -o /dev/null -w "%{http_code}" http://localhost:8081/api/services | grep -q "200"; then
+              echo "✅ Backend started successfully - API responding"
+              # Test the actual response
+              RESPONSE=$(curl -s http://localhost:8081/api/services)
+              echo "📄 API Response preview: ${RESPONSE:0:200}..."
               break
             fi
-            echo "⏳ Attempt $i: Waiting for backend..."
+            echo "⏳ Attempt $i: Waiting for backend... (PID: $BACKEND_PID)"
             sleep 3
+            # Check if backend is still running
+            if ! kill -0 $BACKEND_PID 2>/dev/null; then
+              echo "❌ Backend process died! Checking logs..."
+              ps aux | grep java
+              exit 1
+            fi
           done
-          if [ $i -eq 30 ]; then
-            echo "❌ Backend failed to start after 90 seconds"
+          if [ $i -eq 40 ]; then
+            echo "❌ Backend failed to start after 120 seconds"
+            echo "🔍 Checking Java processes:"
+            ps aux | grep java || echo "No Java processes found"
+            echo "🔍 Checking recent logs:"
+            find . -name "*.log" -exec tail -20 {} \; 2>/dev/null || echo "No log files found"
             exit 1
           fi
       
@@ -67,6 +79,7 @@ jobs:
           # Verify data was inserted
           echo "📊 Checking seeded data:"
           mysql -h 127.0.0.1 -u root -ppass@word1 appointment_db -e "SELECT COUNT(*) as services_count FROM service_entity;"
+          mysql -h 127.0.0.1 -u root -ppass@word1 appointment_db -e "SELECT name FROM service_entity LIMIT 5;"
       
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -82,12 +95,32 @@ jobs:
       
       - name: Start Frontend Server
         run: |
+          echo "🌐 Starting frontend server..."
           npx http-server Capstone-Frontend -p 5500 -c-1 &
           sleep 5
-          echo "Frontend server started"
+          # Test if frontend is accessible
+          if curl -f -s http://localhost:5500 > /dev/null; then
+            echo "✅ Frontend server started successfully"
+          else
+            echo "❌ Frontend server failed to start"
+            exit 1
+          fi
       
       - name: Run Tests
-        run: npx playwright test --project=chromium --workers=2
+        run: |
+          echo "🧪 Running Playwright tests..."
+          echo "🔍 Checking backend connectivity before tests..."
+          BACKEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8081/api/services)
+          echo "Backend status: $BACKEND_STATUS"
+          if [ "$BACKEND_STATUS" = "200" ]; then
+            echo "📄 API Response sample:"
+            curl -s http://localhost:8081/api/services | jq '.data[0:3]' 2>/dev/null || curl -s http://localhost:8081/api/services | head -c 500
+          fi
+          echo "🔍 Checking frontend connectivity..."
+          FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5500)
+          echo "Frontend status: $FRONTEND_STATUS"
+          echo "🚀 Starting tests..."
+          npx playwright test --project=chromium --workers=1 --reporter=line
       
       - name: Upload Test Results
         if: always()
