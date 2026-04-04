@@ -23,23 +23,13 @@ this.cancelBtn = page.locator(".cancel-btn");
 async navigate(){
 
 await this.page.goto(
-"http://127.0.0.1:5500/booking.html?serviceId=1&slotId=1"
+`${BASE_URL}/booking.html?serviceId=1&slotId=1`,
+{ waitUntil: "domcontentloaded" }
 );
 
-/* ensure localStorage exists before page loads */
+/* wait for booking card to appear */
 
-await this.page.evaluate(() => {
-localStorage.setItem("userId","1");
-localStorage.setItem("bookingDate","2026-04-05");
-});
-
-/* reload page after storage set */
-
-await this.page.reload();
-
-/* wait for booking card */
-
-await this.page.waitForSelector(".booking-card",{timeout:15000});
+await this.page.waitForSelector(".booking-card");
 
 }
 
@@ -75,9 +65,7 @@ expect(slot).not.toBe("");
 }
 
 async verifyBookingDate(){
-
 await expect(this.bookingDate).toHaveText("2026-04-05");
-
 }
 
 /* ACTIONS */
