@@ -3,190 +3,235 @@ import { BookingPage } from '../pages/BookingPage';
 
 test.describe("Booking Page Capstone Tests", () => {
 
-  test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }) => {
 
-    /* MOCK LOGIN + DATE */
-    await page.addInitScript(() => {
-      localStorage.setItem("userId", "1");
-      localStorage.setItem("bookingDate", "2026-04-05");
-    });
+/* MOCK LOGIN + DATE */
 
-    /* MOCK SERVICE API */
-    await page.route("**/services/*", route => {
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          data: {
-            name: "Test Service",
-            description: "Test Description",
-            price: 500
-          }
-        })
-      });
-    });
+await page.addInitScript(() => {
+localStorage.setItem("userId","1");
+localStorage.setItem("bookingDate","2026-04-05");
+});
 
-  });
+/* MOCK SERVICE API */
 
+await page.route("**/api/services/*", route => {
+route.fulfill({
+status:200,
+contentType:"application/json",
+body:JSON.stringify({
+data:{
+name:"Test Service",
+description:"Test Description",
+price:500
+}
+})
+});
+});
 
-
-  
-
- 
+});
 
 
-  /* ---------------- UI ---------------- */
+/* ---------------- UI ---------------- */
 
-  test("Confirm button visible", async ({ page }) => {
-    const booking = new BookingPage(page);
-    await booking.navigate();
-    await expect(booking.confirmBtn).toBeVisible();
-  });
+test("Confirm button visible", async ({ page }) => {
 
-  test("Cancel button visible", async ({ page }) => {
-    const booking = new BookingPage(page);
-    await booking.navigate();
-    await expect(booking.cancelBtn).toBeVisible();
-  });
+const booking = new BookingPage(page);
 
-  /* ---------------- API ---------------- */
+await booking.navigate();
 
-  test("Confirm booking API request", async ({ page }) => {
+await expect(booking.confirmBtn).toBeVisible();
 
-    const booking = new BookingPage(page);
-    await booking.navigate();
+});
 
-    const dialogPromise = page.waitForEvent('dialog');
 
-    const [request] = await Promise.all([
-      page.waitForRequest(req =>
-        req.url().includes("/bookings/book") &&
-        req.method() === "POST"
-      ),
-      booking.clickConfirm()
-    ]);
+test("Cancel button visible", async ({ page }) => {
 
-    const dialog = await dialogPromise;
-    await dialog.dismiss();
+const booking = new BookingPage(page);
 
-    expect(request).toBeTruthy();
-  });
+await booking.navigate();
 
-  test("Handle booking success redirect", async ({ page }) => {
+await expect(booking.cancelBtn).toBeVisible();
 
-    await page.route("**/bookings/book*", route => {
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          status: "SUCCESS",
-          data: { id: 101 }
-        })
-      });
-    });
+});
 
-    const booking = new BookingPage(page);
-    await booking.navigate();
 
-    await booking.clickConfirm();
+/* ---------------- API ---------------- */
 
-    await page.waitForURL(/payment\.html/);
-    expect(page.url()).toContain("payment.html");
-  });
+test("Confirm booking API request", async ({ page }) => {
 
-  test("Handle booking failure alert", async ({ page }) => {
+const booking = new BookingPage(page);
 
-    await page.route("**/bookings/book*", route => {
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          status: "FAILED",
-          message: "Booking failed"
-        })
-      });
-    });
+await booking.navigate();
 
-    const booking = new BookingPage(page);
-    await booking.navigate();
+const dialogPromise = page.waitForEvent('dialog');
 
-    const dialogPromise = page.waitForEvent("dialog");
+const [request] = await Promise.all([
 
-    await booking.clickConfirm();
+page.waitForRequest(req =>
+req.url().includes("/bookings/book") &&
+req.method() === "POST"
+),
 
-    const alert = await dialogPromise;
-    expect(alert.message()).toContain("Booking failed");
+booking.clickConfirm()
 
-    await alert.dismiss();
-  });
+]);
 
-  /* ---------------- NAVIGATION ---------------- */
+const dialog = await dialogPromise;
 
-  test("Cancel button navigation", async ({ page }) => {
+await dialog.dismiss();
 
-    const booking = new BookingPage(page);
-    await booking.navigate();
+expect(request).toBeTruthy();
 
-    await booking.clickCancel();
+});
 
-    await expect(page).toHaveURL(/services\.html/);
-  });
 
-  /* ---------------- EDGE ---------------- */
+test("Handle booking success redirect", async ({ page }) => {
 
-  test("Invalid slotId handled", async ({ page }) => {
+await page.route("**/api/bookings/book*", route => {
 
-    await page.goto(
-      "http://127.0.0.1:5500/Capstone-Frontend/booking.html?serviceId=1&slotId=invalid",
-      { waitUntil: "domcontentloaded" }
-    );
+route.fulfill({
+status:200,
+contentType:"application/json",
+body:JSON.stringify({
+status:"SUCCESS",
+data:{ id:101 }
+})
+});
 
-    await expect(page.locator("#slotTime")).toHaveText("Selected Slot");
-  });
+});
 
-  test("Prevent DOM price tampering", async ({ page }) => {
+const booking = new BookingPage(page);
 
-    const booking = new BookingPage(page);
-    await booking.navigate();
+await booking.navigate();
 
-    await page.evaluate(() => {
-      document.getElementById("price").innerText = "1";
-    });
+await booking.clickConfirm();
 
-    const dialogPromise = page.waitForEvent('dialog');
+await page.waitForURL(/payment\.html/);
 
-    await booking.clickConfirm();
+expect(page.url()).toContain("payment.html");
 
-    const dialog = await dialogPromise;
-    await dialog.dismiss();
-  });
+});
 
-  test("Page refresh retains data", async ({ page }) => {
 
-    const booking = new BookingPage(page);
-    await booking.navigate();
+test("Handle booking failure alert", async ({ page }) => {
 
-    await page.reload();
+await page.route("**/api/bookings/book*", route => {
 
-    await booking.verifyServiceDetails();
-  });
+route.fulfill({
+status:200,
+contentType:"application/json",
+body:JSON.stringify({
+status:"FAILED",
+message:"Booking failed"
+})
+});
 
-  test("Slow network booking", async ({ page }) => {
+});
 
-    await page.route("**/bookings/book*", async route => {
-      await new Promise(r => setTimeout(r, 2000));
-      await route.continue();
-    });
+const booking = new BookingPage(page);
 
-    const booking = new BookingPage(page);
-    await booking.navigate();
+await booking.navigate();
 
-    const dialogPromise = page.waitForEvent('dialog');
+const dialogPromise = page.waitForEvent("dialog");
 
-    await booking.clickConfirm();
+await booking.clickConfirm();
 
-    const dialog = await dialogPromise;
-    await dialog.dismiss();
-  });
+const alert = await dialogPromise;
+
+expect(alert.message()).toContain("Booking failed");
+
+await alert.dismiss();
+
+});
+
+
+/* ---------------- NAVIGATION ---------------- */
+
+test("Cancel button navigation", async ({ page }) => {
+
+const booking = new BookingPage(page);
+
+await booking.navigate();
+
+await booking.clickCancel();
+
+await expect(page).toHaveURL(/services\.html/);
+
+});
+
+
+/* ---------------- EDGE ---------------- */
+
+test("Invalid slotId handled", async ({ page }) => {
+
+await page.goto(
+"http://127.0.0.1:5500/booking.html?serviceId=1&slotId=invalid",
+{ waitUntil:"domcontentloaded" }
+);
+
+await expect(page.locator("#slotTime")).toHaveText("Selected Slot");
+
+});
+
+
+test("Prevent DOM price tampering", async ({ page }) => {
+
+const booking = new BookingPage(page);
+
+await booking.navigate();
+
+await page.evaluate(() => {
+
+document.getElementById("price").innerText = "1";
+
+});
+
+const dialogPromise = page.waitForEvent('dialog');
+
+await booking.clickConfirm();
+
+const dialog = await dialogPromise;
+
+await dialog.dismiss();
+
+});
+
+
+test("Page refresh retains data", async ({ page }) => {
+
+const booking = new BookingPage(page);
+
+await booking.navigate();
+
+await page.reload();
+
+await booking.verifyServiceDetails();
+
+});
+
+
+test("Slow network booking", async ({ page }) => {
+
+await page.route("**/api/bookings/book*", async route => {
+
+await new Promise(r => setTimeout(r,2000));
+
+await route.continue();
+
+});
+
+const booking = new BookingPage(page);
+
+await booking.navigate();
+
+const dialogPromise = page.waitForEvent('dialog');
+
+await booking.clickConfirm();
+
+const dialog = await dialogPromise;
+
+await dialog.dismiss();
+
+});
 
 });
