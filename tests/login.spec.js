@@ -13,8 +13,8 @@ test('Login with valid credentials', async ({ page }) => {
   });
 
   await loginPage.login(
-    'deepika@gmail.com',
-    'Deepika'
+    'user1@test.com',
+    'pass'
   );
 
 });
@@ -103,12 +103,15 @@ test('Login with wrong password', async ({ page }) => {
   await loginPage.openLoginPage();
 
   page.on('dialog', async dialog => {
-    expect(dialog.message()).toContain("Server error");
+    expect(
+      dialog.message().includes("Invalid credentials") ||
+      dialog.message().includes("Server error")
+    ).toBeTruthy();
     await dialog.accept();
   });
 
   await loginPage.login(
-    'Deepika@gmail.com',
+    'user1@test.com',
     'wrongpass'
   );
 

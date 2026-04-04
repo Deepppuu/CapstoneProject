@@ -20,7 +20,7 @@ this.confirmButton = page.locator(".confirm-btn");
 async open(){
 
 await this.page.goto(
-  "http://127.0.0.1:5500/Capstone-Frontend/slots.html?serviceId=1"
+  "http://127.0.0.1:5500/slots.html?serviceId=1"
 );
 
 }

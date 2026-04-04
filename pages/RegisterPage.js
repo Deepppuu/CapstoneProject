@@ -11,7 +11,7 @@ this.registerBtn = 'button:has-text("Register")';
 }
 
 async openRegisterPage(){
-await this.page.goto('http://127.0.0.1:5500/Capstone-Frontend/register.html');
+await this.page.goto('http://127.0.0.1:5500/register.html');
 await this.page.waitForSelector(this.name);
 }
 

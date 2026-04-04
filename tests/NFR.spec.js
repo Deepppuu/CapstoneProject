@@ -2,9 +2,9 @@ const { test, expect } = require('@playwright/test');
 
 test.setTimeout(60000);
 
-const LOGIN_URL = "http://127.0.0.1:5500/Capstone-Frontend/login.html";
-const BOOKING_URL = "http://127.0.0.1:5500/Capstone-Frontend/booking.html";
-const SERVICES_URL = "http://127.0.0.1:5500/Capstone-Frontend/services.html";
+const LOGIN_URL = "http://127.0.0.1:5500/login.html";
+const BOOKING_URL = "http://127.0.0.1:5500/booking.html";
+const SERVICES_URL = "http://127.0.0.1:5500/services.html";
 
 test.describe("NFR Tests", () => {
 
