@@ -1,0 +1,140 @@
+name: Playwright Tests + Allure Report CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: pass@word1
+          MYSQL_DATABASE: appointment_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -ppass@word1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build Backend
+        run: |
+          cd online-booking
+          mvn clean install -DskipTests
+
+      - name: Start Backend
+        run: |
+          cd online-booking
+          nohup mvn spring-boot:run &
+          sleep 40
+
+      - name: Wait for Backend API
+        run: npx wait-on http://localhost:8081/api/services
+
+      - name: Install MySQL Client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
+
+      - name: Seed Service Data
+        run: |
+          mysql -h 127.0.0.1 -uroot -ppass@word1 appointment_db <<EOF
+          DELETE FROM service_entity;
+
+          INSERT INTO service_entity (description, name, price) VALUES
+          ('Basic hair trim service','Hair Trim',150),
+          ('Advanced hair cutting','Haircut Premium',300),
+          ('Deep conditioning hair spa','Hair Spa Deluxe',600),
+          ('Quick beard shave','Beard Shave',120),
+          ('Premium beard styling','Beard Style Premium',350),
+          ('Classic facial treatment','Facial Classic',650),
+          ('Luxury facial treatment','Facial Luxury',1200),
+          ('Professional hair coloring','Hair Color Premium',1800),
+          ('Hair highlights styling','Hair Highlights',2000),
+          ('Keratin hair treatment','Keratin Treatment',3500),
+          ('Relaxing oil head massage','Oil Head Massage',350),
+          ('Full body spa therapy','Body Spa',4000),
+          ('Luxury body massage','Body Massage',2500),
+          ('Express manicure service','Express Manicure',250),
+          ('Express pedicure service','Express Pedicure',300),
+          ('Full arm waxing treatment','Full Arm Waxing',700),
+          ('Full leg waxing treatment','Full Leg Waxing',900),
+          ('Eyebrow shaping service','Eyebrow Shaping',120),
+          ('Hair wash and blow dry','Hair Wash',200),
+          ('Professional party hairstyle','Party Hairstyle',900);
+          EOF
+
+      - name: Start Frontend
+        run: |
+          npx serve Capstone-Frontend -l 5500 &
+          sleep 10
+
+      - name: Verify Frontend
+        run: curl -I http://localhost:5500
+
+      - name: Run Playwright Tests
+        run: npx playwright test
+        continue-on-error: true
+
+      - name: Upload Allure Raw Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+
+      - name: Generate Allure Report
+        if: always()
+        run: |
+          npm run allure:generate
+
+      - name: Upload Allure HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report
+
+      - name: Deploy Allure Report to GitHub Pages
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-report
