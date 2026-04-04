@@ -99,8 +99,8 @@ jobs:
           DELETE FROM \`user\`;
           DELETE FROM service_entity;
 
-          INSERT INTO \`user\` (id,name,email) VALUES
-          (1,'Test User','test@example.com');
+          INSERT INTO \`user\` (id,name,email,password) VALUES
+          (1,'Test User','test@example.com','test123');
 
           INSERT INTO slot (id,time,available) VALUES
           (1,'10:00 AM',true);
