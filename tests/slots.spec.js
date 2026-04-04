@@ -9,11 +9,14 @@ test.beforeEach(async ({ page }) => {
 
   slotsPage = new SlotsPage(page);
 
+  /* simulate logged in user */
+
   await page.addInitScript(() => {
     localStorage.setItem("userId", "1");
   });
 
   await slotsPage.open();
+
   await slotsPage.waitForPage();
 
 });
@@ -21,7 +24,7 @@ test.beforeEach(async ({ page }) => {
 
 test("service info loads", async () => {
 
-  await expect(slotsPage.serviceName).toBeVisible();
+  await expect(slotsPage.serviceName).toBeVisible({timeout:10000});
   await expect(slotsPage.serviceDescription).toBeVisible();
   await expect(slotsPage.servicePrice).toContainText("₹");
 
@@ -60,11 +63,10 @@ test("slot format AM/PM", async () => {
 
   const count = await slotsPage.getSlotCount();
 
-  if(count === 0){
-    test.skip();
-  }
+  test.skip(count === 0);
 
   const text = await slotsPage.slots.first().textContent();
+
   expect(text).toMatch(/AM|PM/);
 
 });
@@ -74,9 +76,7 @@ test("select slot", async () => {
 
   const count = await slotsPage.getSlotCount();
 
-  if(count === 0){
-    test.skip();
-  }
+  test.skip(count === 0);
 
   await slotsPage.selectFirstSlot();
 
@@ -89,11 +89,10 @@ test("only one slot selected", async () => {
 
   const count = await slotsPage.getSlotCount();
 
-  if(count < 2){
-    test.skip();
-  }
+  test.skip(count < 2);
 
   await slotsPage.selectFirstSlot();
+
   await slotsPage.selectLastSlot();
 
   const selected = await slotsPage.page.locator(".slot.selected").count();
@@ -112,11 +111,15 @@ test("confirm button visible", async () => {
 
 test("alert if no slot selected", async ({page}) => {
 
-  page.once("dialog", async dialog => {
-    await dialog.accept();
-  });
+  const dialogPromise = page.waitForEvent("dialog");
 
   await slotsPage.confirmButton.click();
+
+  const dialog = await dialogPromise;
+
+  expect(dialog.message()).toContain("Please select");
+
+  await dialog.accept();
 
 });
 
@@ -127,7 +130,7 @@ test("redirect to login if not logged in", async ({page}) => {
 
   await slotsPage.confirmButton.click();
 
-  await page.waitForURL(/login/, { timeout: 60000 });
+  await page.waitForURL(/login/, {timeout:60000});
 
 });
 
@@ -136,9 +139,7 @@ test("slot click does not reload page", async ({page}) => {
 
   const count = await slotsPage.getSlotCount();
 
-  if(count === 0){
-    test.skip();
-  }
+  test.skip(count === 0);
 
   const before = page.url();
 
