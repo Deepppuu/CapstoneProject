@@ -27,9 +27,9 @@ await this.page.goto(
 { waitUntil: "domcontentloaded" }
 );
 
-/* wait for booking card to appear */
+/* wait until booking card exists */
 
-await this.page.waitForSelector(".booking-card");
+await this.page.waitForSelector(".booking-card",{timeout:20000});
 
 }
 
