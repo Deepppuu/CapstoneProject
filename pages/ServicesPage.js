@@ -24,6 +24,7 @@ this.navLogin = page.locator("a[href='login.html']");
 
 async openServicesPage(){
 await this.page.goto("http://127.0.0.1:5500/Capstone-Frontend/services.html");
+await this.page.waitForSelector('.service-card', { timeout: 15000 });
 }
 
 async getServiceCount(){

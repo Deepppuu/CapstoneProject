@@ -110,11 +110,13 @@ await expect(page.locator("text=Active")).toBeVisible();
 test("User data API call success", async ({ page }) => {
 const profile = new ProfilePage(page);
 
-await profile.navigate();
-
-const response = await page.waitForResponse(res =>
+const responsePromise = page.waitForResponse(res =>
 res.url().includes("/api/users/") && res.status() === 200
 );
+
+await profile.navigate();
+
+const response = await responsePromise;
 
 expect(response.ok()).toBeTruthy();
 });

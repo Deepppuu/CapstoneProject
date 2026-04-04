@@ -21,7 +21,7 @@ this.navbar = page.locator("#navbar");
 async navigate(){
 await this.page.goto(
   "http://127.0.0.1:5500/Capstone-Frontend/profile.html",
-  { waitUntil: "domcontentloaded" }
+  { waitUntil: "networkidle" }
 );
 }
 

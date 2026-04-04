@@ -37,6 +37,11 @@ await this.serviceInfo.waitFor({
   timeout: 60000
 });
 
+await this.serviceName.waitFor({
+  state: "visible",
+  timeout: 60000
+});
+
 }
 
 
