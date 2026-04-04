@@ -15,10 +15,13 @@ export class PaymentPage {
   }
 
   async navigate(bookingId){
+
     await this.page.goto(
-      `http://127.0.0.1:5500/Capstone-Frontend/payment.html?bookingId=${bookingId}`,
+      `http://127.0.0.1:5500/payment.html?bookingId=${bookingId}`,
       { waitUntil: "domcontentloaded" }
     );
+
+    await this.page.waitForSelector("#serviceName");
   }
 
   async verifyServiceName(name){
