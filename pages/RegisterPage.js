@@ -11,16 +11,24 @@ this.registerBtn = 'button:has-text("Register")';
 }
 
 async openRegisterPage(){
+
 await this.page.goto('http://127.0.0.1:5500/register.html');
+
+/* wait until page loads */
+
 await this.page.waitForSelector(this.name);
+
 }
 
 async register(name,email,password,confirmPassword){
+
 await this.page.fill(this.name,name);
 await this.page.fill(this.email,email);
 await this.page.fill(this.password,password);
 await this.page.fill(this.confirmPassword,confirmPassword);
+
 await this.page.click(this.registerBtn);
+
 }
 
 }
