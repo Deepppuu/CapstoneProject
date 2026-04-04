@@ -95,14 +95,15 @@ jobs:
       
       - name: Start Frontend Server
         run: |
-          echo "🌐 Starting frontend server..."
-          npx http-server Capstone-Frontend -p 5500 -c-1 &
+          echo "🌐 Starting frontend server from repository root..."
+          npx http-server -p 5500 -c-1 &
           sleep 5
           # Test if frontend is accessible
-          if curl -f -s http://localhost:5500 > /dev/null; then
+          if curl -f -s http://localhost:5500/Capstone-Frontend/services.html > /dev/null; then
             echo "✅ Frontend server started successfully"
           else
-            echo "❌ Frontend server failed to start"
+            echo "❌ Frontend server failed to start or page path is wrong"
+            curl -I http://localhost:5500 || true
             exit 1
           fi
       
