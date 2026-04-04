@@ -67,7 +67,7 @@ jobs:
           nohup mvn spring-boot:run &
           sleep 80
 
-      - name: Wait for Backend
+      - name: Wait for Backend API
         run: npx wait-on http://localhost:8081/api/services
 
       - name: Install MySQL Client
@@ -75,23 +75,37 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mysql-client
 
+      - name: Wait for Tables
+        run: |
+          for i in {1..30}; do
+            TABLE_EXISTS=$(mysql -h 127.0.0.1 -uroot -ppass@word1 -D appointment_db -se "SHOW TABLES LIKE 'service_entity';")
+            if [ "$TABLE_EXISTS" = "service_entity" ]; then
+              echo "Tables created"
+              exit 0
+            fi
+            echo "Waiting for tables..."
+            sleep 5
+          done
+          echo "Tables not created"
+          exit 1
+
       - name: Seed Database
         run: |
           mysql -h 127.0.0.1 -uroot -ppass@word1 appointment_db <<EOF
 
-          DELETE FROM payment_entity;
-          DELETE FROM booking_entity;
-          DELETE FROM slot_entity;
+          DELETE FROM payment;
+          DELETE FROM booking;
+          DELETE FROM slot;
           DELETE FROM users;
           DELETE FROM service_entity;
 
-          INSERT INTO users (id, name, email) VALUES
+          INSERT INTO users (id,name,email) VALUES
           (1,'Test User','test@example.com');
 
-          INSERT INTO slot_entity (id, time, available) VALUES
+          INSERT INTO slot (id,time,available) VALUES
           (1,'10:00 AM',true);
 
-          INSERT INTO service_entity (description, name, price) VALUES
+          INSERT INTO service_entity (description,name,price) VALUES
           ('Basic hair trim service','Hair Trim',150),
           ('Advanced hair cutting','Haircut Premium',300),
           ('Deep conditioning hair spa','Hair Spa Deluxe',600),
@@ -113,10 +127,10 @@ jobs:
           ('Hair wash and blow dry','Hair Wash',200),
           ('Professional party hairstyle','Party Hairstyle',900);
 
-          INSERT INTO booking_entity (id, user_id, service_id, slot_id) VALUES
+          INSERT INTO booking (id,user_id,service_id,slot_id) VALUES
           (1,1,1,1);
 
-          INSERT INTO payment_entity (id, booking_id, amount, status) VALUES
+          INSERT INTO payment (id,booking_id,amount,status) VALUES
           (1,1,150,'PAID');
 
           EOF
