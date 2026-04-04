@@ -23,15 +23,22 @@ this.cancelBtn = page.locator(".cancel-btn");
 async navigate(){
 
 await this.page.goto(
-`${BASE_URL}/Capstone-Frontend/booking.html?serviceId=1&slotId=6`
+"http://127.0.0.1:5500/Capstone-Frontend/booking.html?serviceId=1&slotId=1",
+{ waitUntil: "domcontentloaded" }
 );
 
-/* wait for elements instead of waitForFunction */
+/* wait for booking card */
+await this.page.waitForSelector(".booking-card");
 
-await this.page.waitForSelector("#serviceName");
+/* wait until service name is filled */
+await this.page.waitForFunction(() => {
+const name = document.querySelector("#serviceName")?.textContent;
+return name && name.trim() !== "";
+});
+
+/* wait for slot and price */
 await this.page.waitForSelector("#slotTime");
 await this.page.waitForSelector("#price");
-await this.page.waitForSelector(".booking-card");
 
 }
 
