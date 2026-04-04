@@ -13,7 +13,7 @@ permissions:
   id-token: write
 
 jobs:
-  test-and-report:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 90
 
@@ -67,7 +67,7 @@ jobs:
           nohup mvn spring-boot:run &
           sleep 80
 
-      - name: Wait for Backend API
+      - name: Wait for Backend
         run: npx wait-on http://localhost:8081/api/services
 
       - name: Install MySQL Client
@@ -75,10 +75,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mysql-client
 
-      - name: Seed Service Data
+      - name: Seed Database
         run: |
           mysql -h 127.0.0.1 -uroot -ppass@word1 appointment_db <<EOF
+
+          DELETE FROM payment_entity;
+          DELETE FROM booking_entity;
+          DELETE FROM slot_entity;
+          DELETE FROM users;
           DELETE FROM service_entity;
+
+          INSERT INTO users (id, name, email) VALUES
+          (1,'Test User','test@example.com');
+
+          INSERT INTO slot_entity (id, time, available) VALUES
+          (1,'10:00 AM',true);
 
           INSERT INTO service_entity (description, name, price) VALUES
           ('Basic hair trim service','Hair Trim',150),
@@ -101,6 +112,13 @@ jobs:
           ('Eyebrow shaping service','Eyebrow Shaping',120),
           ('Hair wash and blow dry','Hair Wash',200),
           ('Professional party hairstyle','Party Hairstyle',900);
+
+          INSERT INTO booking_entity (id, user_id, service_id, slot_id) VALUES
+          (1,1,1,1);
+
+          INSERT INTO payment_entity (id, booking_id, amount, status) VALUES
+          (1,1,150,'PAID');
+
           EOF
 
       - name: Start Frontend
@@ -111,7 +129,7 @@ jobs:
       - name: Verify Frontend
         run: curl -I http://localhost:5500
 
-      - name: Run Playwright Tests (Stable Mode)
+      - name: Run Playwright Tests
         run: npx playwright test --workers=1 --reporter=line
         continue-on-error: true
 
@@ -124,8 +142,7 @@ jobs:
 
       - name: Generate Allure Report
         if: always()
-        run: |
-          npm run allure:generate
+        run: npm run allure:generate
 
       - name: Upload Allure HTML Report
         if: always()
