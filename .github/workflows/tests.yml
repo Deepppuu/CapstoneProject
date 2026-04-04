@@ -38,24 +38,35 @@ jobs:
         run: |
           cd online-booking
           mvn clean install -q -Dmaven.test.skip=true
+          echo "Starting backend server..."
           timeout 120 mvn spring-boot:run &
           echo "Waiting for backend to start and create tables..."
-          sleep 15
-          for i in {1..20}; do
-            if curl -f http://localhost:8081/api/services > /dev/null 2>&1; then
-              echo "Backend started successfully - tables created"
-              sleep 2
+          sleep 20
+          for i in {1..30}; do
+            if curl -f -s http://localhost:8081/api/services > /dev/null 2>&1; then
+              echo "✅ Backend started successfully - tables created"
+              sleep 3
+              # Test the API to make sure it's working
+              curl -s http://localhost:8081/api/services | head -c 100
+              echo ""
               break
             fi
-            echo "Attempt $i: Waiting for backend..."
-            sleep 1
+            echo "⏳ Attempt $i: Waiting for backend..."
+            sleep 3
           done
+          if [ $i -eq 30 ]; then
+            echo "❌ Backend failed to start after 90 seconds"
+            exit 1
+          fi
       
       - name: Seed Database
         run: |
-          echo "Seeding database with test data..."
+          echo "🌱 Seeding database with test data..."
           mysql -h 127.0.0.1 -u root -ppass@word1 appointment_db < database/seed.sql
-          echo "Database seeded successfully"
+          echo "✅ Database seeded successfully"
+          # Verify data was inserted
+          echo "📊 Checking seeded data:"
+          mysql -h 127.0.0.1 -u root -ppass@word1 appointment_db -e "SELECT COUNT(*) as services_count FROM service_entity;"
       
       - name: Set up Node
         uses: actions/setup-node@v4
