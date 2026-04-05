@@ -7,50 +7,53 @@ test.describe("Payment Page Capstone Tests", () => {
 
   test.beforeEach(async ({ page }) => {
 
-    // Simulate logged-in user
+    // simulate logged in user
     await page.addInitScript(() => {
       localStorage.setItem("userId", "1");
     });
 
-    // Mock booking API (data used by payment page)
-    await page.route("**/api/bookings/**", async route => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          data: {
-            id: 1,
-            slot: {
+    // intercept ALL API calls and return mock data
+    await page.route("**/api/**", async route => {
+
+      const url = route.request().url();
+
+      if (url.includes("/bookings")) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            data: {
               id: 1,
-              date: "2026-04-05",
-              time: "10:00 AM",
-              service: {
-                id: 1,
-                name: "Haircut Premium",
-                price: 300
+              slot: {
+                date: "2026-04-05",
+                time: "10:00 AM",
+                service: {
+                  name: "Haircut Premium",
+                  price: 300
+                }
               }
             }
-          }
-        })
-      });
-    });
+          })
+        });
+      }
 
-    // Mock payment API
-    await page.route("**/api/payments/**", async route => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          success: true,
-          message: "Payment successful"
-        })
-      });
+      if (url.includes("/payments")) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            success: true
+          })
+        });
+      }
+
+      return route.continue();
     });
 
     payment = new PaymentPage(page);
 
-    // Open payment page (bookingId must exist)
     await payment.navigate(1);
+
   });
 
 
@@ -85,22 +88,31 @@ test.describe("Payment Page Capstone Tests", () => {
 
 
   test("Select payment method", async () => {
+
     await payment.paymentOptions.first().click();
+
     await expect(payment.paymentOptions.first()).toBeChecked();
+
   });
 
 
   test("Payment success flow", async ({ page }) => {
+
     await payment.paymentOptions.first().click();
+
     await payment.payBtn.click();
+
   });
 
 
   test("Payment failure shows alert", async ({ page }) => {
+
     page.once("dialog", async dialog => {
       await dialog.accept();
     });
+
     await payment.payBtn.click();
+
   });
 
 });
