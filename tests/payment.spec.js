@@ -14,10 +14,9 @@ test.beforeEach(async ({ page }) => {
 
   payment = new PaymentPage(page);
 
-  // open payment page with bookingId
   await page.goto("http://127.0.0.1:5500/payment.html?bookingId=1");
 
-  // force UI values so selectors exist
+  // Force UI data so the page object wait works
   await page.evaluate(() => {
 
     const service = document.getElementById("serviceName");
@@ -25,59 +24,45 @@ test.beforeEach(async ({ page }) => {
     const time = document.getElementById("slotTime");
     const price = document.getElementById("price");
 
-    if (service) service.innerText = "Haircut Premium";
-    if (date) date.innerText = "2026-04-05";
-    if (time) time.innerText = "10:00 AM";
-    if (price) price.innerText = "300";
+    if(service) service.innerText = "Haircut Premium";
+    if(date) date.innerText = "2026-04-05";
+    if(time) time.innerText = "10:00 AM";
+    if(price) price.innerText = "300";
 
   });
 
-  // wait for UI
   await page.waitForSelector("#serviceName");
 
 });
 
 
-
 test("Payment page loads", async ({ page }) => {
-
   await expect(page.locator("body")).toBeVisible();
-
 });
 
 
 test("Service name displayed correctly", async ({ page }) => {
-
   await expect(page.locator("#serviceName")).toHaveText("Haircut Premium");
-
 });
 
 
 test("Date displayed correctly", async ({ page }) => {
-
   await expect(page.locator("#bookingDate")).toHaveText("2026-04-05");
-
 });
 
 
 test("Time displayed correctly", async ({ page }) => {
-
   await expect(page.locator("#slotTime")).toHaveText("10:00 AM");
-
 });
 
 
 test("Price displayed correctly", async ({ page }) => {
-
   await expect(page.locator("#price")).toHaveText("300");
-
 });
 
 
 test("Payment options visible", async ({ page }) => {
-
   await expect(page.locator("input[name='paymentMethod']").first()).toBeVisible();
-
 });
 
 
