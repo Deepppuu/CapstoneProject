@@ -133,12 +133,14 @@ jobs:
           sleep 15
 
       - name: Run Playwright Tests
-        run: npx playwright test --workers=2 --reporter=line
+        run: npx playwright test --workers=2
         continue-on-error: true
 
+      - name: Install Allure CLI
+        run: npm install -g allure-commandline
+
       - name: Generate Allure Report
-        run: |
-          npx allure generate ./allure-results --clean -o ./allure-report
+        run: npm run allure:generate
 
       - name: Deploy Allure Report
         uses: peaceiris/actions-gh-pages@v3
