@@ -7,13 +7,15 @@ test.describe("Payment Page Capstone Tests", () => {
 
   test.beforeEach(async ({ page }) => {
 
-    // simulate logged in user
+    /* simulate logged in user */
     await page.addInitScript(() => {
       localStorage.setItem("userId", "1");
     });
 
-    // IMPORTANT: mock API BEFORE page loads
-    await page.route("**/api/bookings/**", async route => {
+    /* MOCK BOOKING API */
+
+    await page.route("**localhost:8081/api/bookings/**", async route => {
+
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -31,19 +33,25 @@ test.describe("Payment Page Capstone Tests", () => {
           }
         })
       });
+
     });
 
-    await page.route("**/api/payments/**", async route => {
+    /* MOCK PAYMENT API */
+
+    await page.route("**localhost:8081/api/payments/**", async route => {
+
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({ success: true })
+        body: JSON.stringify({
+          success: true
+        })
       });
+
     });
 
     payment = new PaymentPage(page);
 
-    // open page AFTER mocks are ready
     await payment.navigate(1);
 
   });
@@ -88,7 +96,7 @@ test.describe("Payment Page Capstone Tests", () => {
   });
 
 
-  test("Payment success flow", async ({ page }) => {
+  test("Payment success flow", async () => {
 
     await payment.paymentOptions.first().click();
 
