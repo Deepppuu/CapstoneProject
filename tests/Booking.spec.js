@@ -48,7 +48,7 @@ test("Confirm button visible", async ({ page }) => {
 const booking = new BookingPage(page);
 
 await booking.navigate();
-await page.waitForSelector("#price");
+await booking.waitForBookingData();
 
 await expect(booking.confirmBtn).toBeVisible();
 
@@ -60,7 +60,7 @@ test("Cancel button visible", async ({ page }) => {
 const booking = new BookingPage(page);
 
 await booking.navigate();
-await page.waitForSelector("#price");
+await booking.waitForBookingData();
 
 await expect(booking.cancelBtn).toBeVisible();
 
@@ -74,7 +74,7 @@ test("Confirm booking API request", async ({ page }) => {
 const booking = new BookingPage(page);
 
 await booking.navigate();
-await page.waitForSelector("#price");
+await booking.waitForBookingData();
 
 const [request] = await Promise.all([
 
@@ -97,7 +97,7 @@ test("Handle booking success redirect", async ({ page }) => {
 const booking = new BookingPage(page);
 
 await booking.navigate();
-await page.waitForSelector("#price");
+await booking.waitForBookingData();
 
 await booking.clickConfirm();
 
@@ -124,7 +124,7 @@ message:"Booking failed"
 const booking = new BookingPage(page);
 
 await booking.navigate();
-await page.waitForSelector("#price");
+await booking.waitForBookingData();
 
 const dialogPromise = page.waitForEvent("dialog");
 
@@ -146,7 +146,7 @@ test("Cancel button navigation", async ({ page }) => {
 const booking = new BookingPage(page);
 
 await booking.navigate();
-await page.waitForSelector("#price");
+await booking.waitForBookingData();
 
 await booking.clickCancel();
 
@@ -189,7 +189,7 @@ test("Prevent DOM price tampering", async ({ page }) => {
 const booking = new BookingPage(page);
 
 await booking.navigate();
-await page.waitForSelector("#price");
+await booking.waitForBookingData();
 
 await page.evaluate(() => {
 document.getElementById("price").innerText="1";
@@ -211,7 +211,7 @@ test("Page refresh retains data", async ({ page }) => {
 const booking = new BookingPage(page);
 
 await booking.navigate();
-await page.waitForSelector("#price");
+await booking.waitForBookingData();
 
 await page.reload();
 
@@ -240,7 +240,7 @@ data:{ id:101 }
 const booking = new BookingPage(page);
 
 await booking.navigate();
-await page.waitForSelector("#price");
+await booking.waitForBookingData();
 
 await booking.clickConfirm();
 
