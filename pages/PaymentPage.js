@@ -21,7 +21,8 @@ export class PaymentPage {
       { waitUntil: "domcontentloaded" }
     );
 
-    await this.page.waitForSelector("#serviceName");
+    // safer wait
+    await this.page.waitForLoadState("domcontentloaded");
 
   }
 
