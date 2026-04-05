@@ -1,0 +1,1 @@
+Dialog: Name must contain only letters and be 3–30 characters long

@@ -1,0 +1,42 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - link "BookEase" [ref=e5] [cursor=pointer]:
+        - /url: index.html
+      - list [ref=e7]:
+        - listitem [ref=e8]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: index.html
+        - listitem [ref=e10]:
+          - link "Services" [ref=e11] [cursor=pointer]:
+            - /url: services.html
+        - listitem [ref=e12]:
+          - link "My Bookings" [ref=e13] [cursor=pointer]:
+            - /url: bookings.html
+        - listitem [ref=e14]:
+          - link "Profile" [ref=e15] [cursor=pointer]:
+            - /url: profile.html
+        - listitem [ref=e16]:
+          - link "Login" [ref=e17] [cursor=pointer]:
+            - /url: login.html
+  - generic [ref=e21]:
+    - generic [ref=e22]: T
+    - heading "My Profile" [level=4] [ref=e23]
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - generic [ref=e26]: User ID
+        - generic [ref=e27]: "2"
+      - generic [ref=e28]:
+        - generic [ref=e29]: Name
+        - generic [ref=e30]: Test User
+      - generic [ref=e31]:
+        - generic [ref=e32]: Email
+        - generic [ref=e33]: testuser@email.com
+      - generic [ref=e34]:
+        - generic [ref=e35]: Account Status
+        - generic [ref=e36]: Active
+      - button "Logout" [ref=e37] [cursor=pointer]
+```
