@@ -27,10 +27,14 @@ await this.page.goto(
 { waitUntil: "domcontentloaded" }
 );
 
-/* wait until booking card exists */
-
 await this.page.waitForSelector(".booking-card",{timeout:20000});
 
+}
+
+/* WAIT FOR DATA */
+
+async waitForBookingData(){
+await expect(this.servicePrice).not.toBeEmpty();
 }
 
 /* VALIDATIONS */
