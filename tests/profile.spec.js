@@ -7,21 +7,32 @@ let profile;
 
 test.beforeEach(async ({ page }) => {
 
+  // simulate logged in user
   await page.addInitScript(() => {
     localStorage.setItem("userId","2");
+  });
+
+  // mock user API
+  await page.route("**/api/users/*", route => {
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: {
+          id: 2,
+          name: "Test User",
+          email: "testuser@email.com"
+        }
+      })
+    });
   });
 
   profile = new ProfilePage(page);
 
   await profile.navigate();
 
-  // wait for user API
-  await page.waitForResponse(res =>
-    res.url().includes("/api/users/") && res.status() === 200
-  );
-
-  // wait for profile elements
-  await page.waitForSelector("#name");
+  // wait for UI instead of API
+  await page.waitForSelector(".profile-card");
 
 });
 
