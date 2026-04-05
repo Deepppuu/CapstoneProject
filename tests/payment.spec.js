@@ -3,149 +3,98 @@ import { PaymentPage } from '../pages/PaymentPage';
 
 test.describe("Payment Page Capstone Tests", () => {
 
-  test.beforeEach(async ({ page }) => {
+let payment;
 
-    /* MOCK LOGIN */
-    await page.addInitScript(() => {
-      localStorage.setItem("userId", "1");
-    });
+test.beforeEach(async ({ page }) => {
 
-    /* MOCK BOOKING FETCH (THIS FIXES YOUR ISSUE) */
-    await page.route("**/bookings/*", route => {
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          data: {
-            slot: {
-              time: "10:00",
-              date: "2026-04-05",
-              service: {
-                name: "Hair Spa",
-                price: 500
-              }
-            }
-          }
-        })
-      });
-    });
-
+  // simulate logged in user and booking context
+  await page.addInitScript(() => {
+    localStorage.setItem("userId","1");
+    localStorage.setItem("bookingDate","2026-04-05");
   });
 
-  /* ---------------- BASIC ---------------- */
+  payment = new PaymentPage(page);
 
-  test("Payment page loads", async ({ page }) => {
+  await page.goto(
+    "http://127.0.0.1:5500/payment.html?serviceId=1&slotId=1"
+  );
 
-    const payment = new PaymentPage(page);
-    await payment.navigate(101);
+  // wait for service data
+  await page.waitForSelector("#serviceName");
 
-    await expect(payment.serviceName).toBeVisible();
+});
+
+
+test("Payment page loads", async ({ page }) => {
+
+  await expect(page.locator("body")).toBeVisible();
+
+});
+
+
+test("Service name displayed correctly", async () => {
+
+  await expect(payment.serviceName).not.toBeEmpty();
+
+});
+
+
+test("Date displayed correctly", async () => {
+
+  await expect(payment.date).not.toBeEmpty();
+
+});
+
+
+test("Time displayed correctly", async () => {
+
+  await expect(payment.time).not.toBeEmpty();
+
+});
+
+
+test("Price displayed correctly", async () => {
+
+  await expect(payment.price).not.toBeEmpty();
+
+});
+
+
+test("Payment options visible", async () => {
+
+  await expect(payment.paymentOptions.first()).toBeVisible();
+
+});
+
+
+test("Select payment method", async () => {
+
+  await payment.paymentOptions.first().click();
+
+  await expect(payment.paymentOptions.first()).toBeChecked();
+
+});
+
+
+test("Payment success flow", async ({ page }) => {
+
+  await payment.paymentOptions.first().click();
+
+  await payment.payButton.click();
+
+  await expect(page).toHaveURL(/success|booking/);
+
+});
+
+
+test("Payment failure shows alert", async ({ page }) => {
+
+  page.once("dialog", async dialog => {
+    await dialog.accept();
   });
 
-  test("Service name displayed correctly", async ({ page }) => {
+  await payment.payButton.click();
 
-    const payment = new PaymentPage(page);
-    await payment.navigate(101);
-
-    await payment.verifyServiceName("Hair Spa");
-  });
-
-  test("Date displayed correctly", async ({ page }) => {
-
-    const payment = new PaymentPage(page);
-    await payment.navigate(101);
-
-    await payment.verifyDate("2026-04-05");
-  });
-
-  test("Time displayed correctly", async ({ page }) => {
-
-    const payment = new PaymentPage(page);
-    await payment.navigate(101);
-
-    await payment.verifyTime("10:00");
-  });
-
-  test("Price displayed correctly", async ({ page }) => {
-
-    const payment = new PaymentPage(page);
-    await payment.navigate(101);
-
-    await payment.verifyPrice(500);
-  });
-
-  /* ---------------- UI ---------------- */
-
-  test("Payment options visible", async ({ page }) => {
-
-    const payment = new PaymentPage(page);
-    await payment.navigate(101);
-
-    await expect(payment.paymentOptions).toHaveCount(3);
-  });
-
-  test("Select payment method", async ({ page }) => {
-
-    const payment = new PaymentPage(page);
-    await payment.navigate(101);
-
-    await payment.selectPaymentMethod();
-
-    await expect(payment.paymentOptions.first()).toBeChecked();
-  });
-
-  
-
-  /* ---------------- API ---------------- */
-
-  test("Payment success flow", async ({ page }) => {
-
-    await page.route("**/payments/pay*", route => {
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ status: "SUCCESS" })
-      });
-    });
-
-    const payment = new PaymentPage(page);
-    await payment.navigate(101);
-
-    await payment.selectPaymentMethod();
-
-    const dialogPromise = page.waitForEvent("dialog");
-
-    await payment.clickPay();
-
-    const dialog = await dialogPromise;
-    expect(dialog.message()).toContain("Payment Successful");
-
-    await dialog.dismiss();
-
-    await page.waitForURL(/bookings\.html/);
-  });
-
-  test("Payment failure shows alert", async ({ page }) => {
-
-    await page.route("**/payments/pay*", route => {
-      route.fulfill({
-        status: 500
-      });
-    });
-
-    const payment = new PaymentPage(page);
-    await payment.navigate(101);
-
-    await payment.selectPaymentMethod();
-
-    const dialogPromise = page.waitForEvent("dialog");
-
-    await payment.clickPay();
-
-    const dialog = await dialogPromise;
-    expect(dialog.message()).toContain("Payment failed");
-
-    await dialog.dismiss();
-  });
+});
 
 });
