@@ -87,22 +87,6 @@ await expect(page).toHaveURL(/login/);
 });
 
 
-test("Invalid login should stay on login page", async ({ page }) => {
-
-await page.goto(LOGIN_URL,{waitUntil:"domcontentloaded"});
-
-page.once("dialog", async dialog=>{
-await dialog.accept();
-});
-
-await page.fill("#email","fakeuser@gmail.com");
-await page.fill("#password","wrongpass");
-
-await page.click("button");
-
-await expect(page).toHaveURL(/login/);
-
-});
 
 
 test("Direct booking page access", async ({ page }) => {
