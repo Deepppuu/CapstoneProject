@@ -133,7 +133,7 @@ jobs:
           sleep 15
 
       - name: Run Playwright Tests
-        run: npx playwright test --workers=2
+        run: npx playwright test --workers=2 --reporter=line,allure-playwright
         continue-on-error: true
 
       - name: Install Allure CLI
