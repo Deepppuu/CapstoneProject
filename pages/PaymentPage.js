@@ -22,6 +22,7 @@ export class PaymentPage {
     );
 
     await this.page.waitForSelector("#serviceName");
+
   }
 
   async verifyServiceName(name){
