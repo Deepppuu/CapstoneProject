@@ -12,46 +12,38 @@ test.describe("Payment Page Capstone Tests", () => {
       localStorage.setItem("userId", "1");
     });
 
-    // intercept ALL API calls and return mock data
-    await page.route("**/api/**", async route => {
-
-      const url = route.request().url();
-
-      if (url.includes("/bookings")) {
-        return route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({
-            data: {
-              id: 1,
-              slot: {
-                date: "2026-04-05",
-                time: "10:00 AM",
-                service: {
-                  name: "Haircut Premium",
-                  price: 300
-                }
+    // IMPORTANT: mock API BEFORE page loads
+    await page.route("**/api/bookings/**", async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          data: {
+            id: 1,
+            slot: {
+              date: "2026-04-05",
+              time: "10:00 AM",
+              service: {
+                name: "Haircut Premium",
+                price: 300
               }
             }
-          })
-        });
-      }
+          }
+        })
+      });
+    });
 
-      if (url.includes("/payments")) {
-        return route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({
-            success: true
-          })
-        });
-      }
-
-      return route.continue();
+    await page.route("**/api/payments/**", async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true })
+      });
     });
 
     payment = new PaymentPage(page);
 
+    // open page AFTER mocks are ready
     await payment.navigate(1);
 
   });
