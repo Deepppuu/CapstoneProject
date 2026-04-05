@@ -7,8 +7,7 @@ let profile;
 
 test.beforeEach(async ({ page }) => {
 
-  // Mock login
-  await page.addInitScript(()=>{
+  await page.addInitScript(() => {
     localStorage.setItem("userId","2");
   });
 
@@ -16,7 +15,12 @@ test.beforeEach(async ({ page }) => {
 
   await profile.navigate();
 
-  // Wait for user data to load
+  // wait for user API
+  await page.waitForResponse(res =>
+    res.url().includes("/api/users/") && res.status() === 200
+  );
+
+  // wait for profile elements
   await page.waitForSelector("#name");
 
 });
@@ -58,32 +62,23 @@ test("Logout button visible", async () => {
 
 
 test("Logout redirects to login", async ({ page }) => {
-
   await profile.clickLogout();
-
   await expect(page).toHaveURL(/login/);
-
 });
 
 
 test("Profile container visible", async ({ page }) => {
-
   await expect(page.locator(".profile-card")).toBeVisible();
-
 });
 
 
 test("Profile image visible", async ({ page }) => {
-
   await expect(page.locator(".profile-img")).toBeVisible();
-
 });
 
 
 test("Account status is Active", async ({ page }) => {
-
   await expect(page.locator("text=Active")).toBeVisible();
-
 });
 
 
@@ -99,24 +94,18 @@ test("User data API call success", async ({ page }) => {
 
 
 test("Page does not crash on load", async ({ page }) => {
-
   await expect(page.locator("body")).toBeVisible();
-
 });
 
 
 test("Profile values not empty", async () => {
-
   await expect(profile.name).not.toBeEmpty();
   await expect(profile.email).not.toBeEmpty();
-
 });
 
 
 test("Navbar loads correctly", async ({ page }) => {
-
   await expect(page.locator("#navbar")).toBeVisible();
-
 });
 
 });
