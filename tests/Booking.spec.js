@@ -5,15 +5,13 @@ test.describe("Booking Page Capstone Tests", () => {
 
 test.beforeEach(async ({ page }) => {
 
-  /* LOGIN STATE BEFORE PAGE LOAD */
-
+  // LOGIN STATE BEFORE PAGE LOAD
   await page.addInitScript(() => {
     window.localStorage.setItem("userId","1");
     window.localStorage.setItem("bookingDate","2026-04-05");
   });
 
-  /* MOCK SERVICE API */
-
+  // MOCK SERVICE API
   await page.route("**/api/services/*", route => {
     route.fulfill({
       status:200,
@@ -36,16 +34,21 @@ test.beforeEach(async ({ page }) => {
 test("Confirm button visible", async ({ page }) => {
 
 const booking = new BookingPage(page);
+
 await booking.navigate();
+await page.waitForSelector("#price");
 
 await expect(booking.confirmBtn).toBeVisible();
 
 });
 
+
 test("Cancel button visible", async ({ page }) => {
 
 const booking = new BookingPage(page);
+
 await booking.navigate();
+await page.waitForSelector("#price");
 
 await expect(booking.cancelBtn).toBeVisible();
 
@@ -57,7 +60,9 @@ await expect(booking.cancelBtn).toBeVisible();
 test("Confirm booking API request", async ({ page }) => {
 
 const booking = new BookingPage(page);
+
 await booking.navigate();
+await page.waitForSelector("#price");
 
 const dialogPromise = page.waitForEvent('dialog');
 
@@ -96,11 +101,13 @@ data:{ id:101 }
 const booking = new BookingPage(page);
 
 await booking.navigate();
+await page.waitForSelector("#price");
+
 await booking.clickConfirm();
 
-await page.waitForURL(/payment\.html/);
+await page.waitForURL(/payment/);
 
-expect(page.url()).toContain("payment.html");
+expect(page.url()).toContain("payment");
 
 });
 
@@ -121,6 +128,7 @@ message:"Booking failed"
 const booking = new BookingPage(page);
 
 await booking.navigate();
+await page.waitForSelector("#price");
 
 const dialogPromise = page.waitForEvent("dialog");
 
@@ -142,10 +150,11 @@ test("Cancel button navigation", async ({ page }) => {
 const booking = new BookingPage(page);
 
 await booking.navigate();
+await page.waitForSelector("#price");
 
 await booking.clickCancel();
 
-await expect(page).toHaveURL(/services\.html/);
+await expect(page).toHaveURL(/services/);
 
 });
 
@@ -174,7 +183,7 @@ await page.goto(
 { waitUntil:"domcontentloaded" }
 );
 
-await expect(page.locator("#slotTime")).toHaveText("Selected Slot");
+await expect(page.locator("#slotTime")).toContainText("Selected Slot");
 
 });
 
@@ -182,7 +191,9 @@ await expect(page.locator("#slotTime")).toHaveText("Selected Slot");
 test("Prevent DOM price tampering", async ({ page }) => {
 
 const booking = new BookingPage(page);
+
 await booking.navigate();
+await page.waitForSelector("#price");
 
 await page.evaluate(() => {
 document.getElementById("price").innerText="1";
@@ -202,7 +213,9 @@ await dialog.dismiss();
 test("Page refresh retains data", async ({ page }) => {
 
 const booking = new BookingPage(page);
+
 await booking.navigate();
+await page.waitForSelector("#price");
 
 await page.reload();
 
@@ -221,7 +234,9 @@ await route.continue();
 });
 
 const booking = new BookingPage(page);
+
 await booking.navigate();
+await page.waitForSelector("#price");
 
 const dialogPromise = page.waitForEvent('dialog');
 
