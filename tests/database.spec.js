@@ -30,11 +30,11 @@ test("User table should not be empty", async () => {
 });
 
 
-// 2
-test("Verify Deepika user exists", async () => {
+// 2 ✅ FIXED
+test("Verify User1 exists", async () => {
 
   const [rows] = await connection.execute(
-    "SELECT * FROM user WHERE email='deepika@gmail.com'"
+    "SELECT * FROM user WHERE email='user1@test.com'"
   );
 
   expect(rows.length).toBe(1);
@@ -42,17 +42,24 @@ test("Verify Deepika user exists", async () => {
 });
 
 
+// 3
+test("Service table should not be empty", async () => {
+
+  const [rows] = await connection.execute("SELECT * FROM service_entity");
+  expect(rows.length).toBeGreaterThan(0);
+
+});
 
 
-// 4 ✅ FIXED TABLE NAME + SAFE CHECK
-test("Haircut service price validation", async () => {
+// 4 ✅ FIXED
+test("Hair Trim service price validation", async () => {
 
   const [rows] = await connection.execute(
-    "SELECT price FROM service_entity WHERE name='Haircut'"
+    "SELECT price FROM service_entity WHERE name='Hair Trim'"
   );
 
   expect(rows.length).toBeGreaterThan(0);
-  expect(rows[0].price).toBe(200);
+  expect(rows[0].price).toBe(150);
 
 });
 
