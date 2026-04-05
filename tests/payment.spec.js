@@ -7,7 +7,7 @@ let payment;
 
 test.beforeEach(async ({ page }) => {
 
-  /* SIMULATE LOGIN */
+  /* simulate logged in user */
 
   await page.addInitScript(() => {
 
@@ -27,8 +27,6 @@ test.beforeEach(async ({ page }) => {
   await page.route("**/api/**", async route => {
 
     const url = route.request().url();
-
-    /* BOOKINGS API */
 
     if (url.includes("/api/bookings")) {
 
@@ -53,42 +51,6 @@ test.beforeEach(async ({ page }) => {
 
     }
 
-    /* SERVICES API */
-
-    if (url.includes("/api/services")) {
-
-      return route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          data: [
-            { id: 1, name: "Haircut Premium", price: 300 },
-            { id: 2, name: "Hair Spa", price: 500 }
-          ]
-        })
-      });
-
-    }
-
-    /* SLOTS API */
-
-    if (url.includes("/api/slots")) {
-
-      return route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          data: [
-            { id: 1, time: "10:00 AM", available: true },
-            { id: 2, time: "11:00 AM", available: true }
-          ]
-        })
-      });
-
-    }
-
-    /* PAYMENTS API */
-
     if (url.includes("/api/payments")) {
 
       return route.fulfill({
@@ -101,8 +63,6 @@ test.beforeEach(async ({ page }) => {
       });
 
     }
-
-    /* DEFAULT RESPONSE */
 
     return route.fulfill({
       status: 200,
