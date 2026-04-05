@@ -6,7 +6,7 @@ const userId = localStorage.getItem("userId");
 
 if (!userId) {
   window.location.href = "login.html";
-  throw new Error("User not logged in");
+  return;   // ✅ CHANGED (removed throw)
 }
 
 /* PARAMS */
@@ -18,7 +18,7 @@ const slotId = params.get("slotId");
 
 if (!serviceId || !slotId) {
   window.location.href = "services.html";
-  throw new Error("Missing params");
+  return;   // ✅ CHANGED (removed throw)
 }
 
 /* SLOT MAP */
@@ -41,30 +41,36 @@ async function loadBooking() {
 
     const service = result.data || {};
 
-    /* ✅ STORE SERVICE IN LOCAL STORAGE */
+    /* STORE SERVICE */
     localStorage.setItem("selectedService", JSON.stringify(service));
 
-    /* STORE SLOT TIME IN LOCAL STORAGE */
+    /* STORE SLOT */
     const slotTime = slotMap[slotId] || "Selected Slot";
     localStorage.setItem("selectedSlotTime", slotTime);
 
     /* SERVICE */
+
     document.getElementById("serviceName").innerText = service.name || "";
     document.getElementById("serviceDescription").innerText = service.description || "";
 
     /* SLOT */
+
     document.getElementById("slotTime").innerText = slotTime;
 
     /* DATE */
+
     const date = localStorage.getItem("bookingDate") || "";
     document.getElementById("bookingDate").innerText = date;
 
     /* PRICE */
+
     document.getElementById("price").innerText = service.price || "";
     document.getElementById("servicePrice").innerText = service.price || "";
 
   } catch (err) {
+
     console.error("Load error:", err);
+
   }
 
 }
@@ -96,8 +102,10 @@ async function confirmBooking() {
     window.location.href = `payment.html?bookingId=${bookingId}`;
 
   } catch (err) {
+
     console.error(err);
     alert("Booking failed");
+
   }
 
 }
