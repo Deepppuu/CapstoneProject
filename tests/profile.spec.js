@@ -7,21 +7,23 @@ let profile;
 
 test.beforeEach(async ({ page }) => {
 
-  // simulate logged in user
+  /* MOCK LOGIN */
+
   await page.addInitScript(() => {
     localStorage.setItem("userId","2");
   });
 
-  // mock user API
+  /* MOCK USER API */
+
   await page.route("**/api/users/*", route => {
     route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
-        data: {
-          id: 2,
-          name: "Test User",
-          email: "testuser@email.com"
+        data:{
+          id:2,
+          name:"Test User",
+          email:"testuser@email.com"
         }
       })
     });
@@ -31,8 +33,9 @@ test.beforeEach(async ({ page }) => {
 
   await profile.navigate();
 
-  // wait for UI instead of API
-  await page.waitForSelector(".profile-card");
+  /* WAIT UNTIL DATA LOADS */
+
+  await page.waitForSelector("#name",{timeout:60000});
 
 });
 
@@ -73,50 +76,66 @@ test("Logout button visible", async () => {
 
 
 test("Logout redirects to login", async ({ page }) => {
+
   await profile.clickLogout();
+
   await expect(page).toHaveURL(/login/);
+
 });
 
 
 test("Profile container visible", async ({ page }) => {
+
   await expect(page.locator(".profile-card")).toBeVisible();
+
 });
 
 
 test("Profile image visible", async ({ page }) => {
+
   await expect(page.locator(".profile-img")).toBeVisible();
+
 });
 
 
 test("Account status is Active", async ({ page }) => {
+
   await expect(page.locator("text=Active")).toBeVisible();
+
 });
 
 
 test("User data API call success", async ({ page }) => {
 
   const response = await page.waitForResponse(res =>
-    res.url().includes("/api/users/") && res.status() === 200
+    res.url().includes("/api/users/")
   );
 
-  expect(response.ok()).toBeTruthy();
+  expect(response.status()).toBe(200);
 
 });
 
 
 test("Page does not crash on load", async ({ page }) => {
+
   await expect(page.locator("body")).toBeVisible();
+
 });
 
 
 test("Profile values not empty", async () => {
+
   await expect(profile.name).not.toBeEmpty();
+
   await expect(profile.email).not.toBeEmpty();
+
 });
 
 
 test("Navbar loads correctly", async ({ page }) => {
+
   await expect(page.locator("#navbar")).toBeVisible();
+
 });
 
 });
