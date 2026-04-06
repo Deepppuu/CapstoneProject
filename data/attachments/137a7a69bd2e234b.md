@@ -1,0 +1,49 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - link "BookEase" [ref=e5]:
+        - /url: index.html
+      - list [ref=e7]:
+        - listitem [ref=e8]:
+          - link "Home" [ref=e9]:
+            - /url: index.html
+        - listitem [ref=e10]:
+          - link "Services" [ref=e11]:
+            - /url: services.html
+        - listitem [ref=e12]:
+          - link "My Bookings" [ref=e13]:
+            - /url: bookings.html
+        - listitem [ref=e14]:
+          - link "Profile" [ref=e15]:
+            - /url: profile.html
+        - listitem [ref=e16]:
+          - link "Login" [ref=e17] [cursor=pointer]:
+            - /url: login.html
+  - generic [ref=e18]:
+    - heading "Book Appointment" [level=3] [ref=e19]
+    - generic [ref=e20]: Loading service...
+    - generic [ref=e21]:
+      - generic [ref=e22]: Select Date
+      - textbox [ref=e23]: 2026-04-06
+    - heading "Available Time Slots" [level=5] [ref=e24]
+    - generic [ref=e25]:
+      - generic [ref=e27] [cursor=pointer]: 09:00 AM
+      - generic [ref=e29] [cursor=pointer]: 10:00 AM
+      - generic [ref=e31] [cursor=pointer]: 11:00 AM
+      - generic [ref=e33] [cursor=pointer]: 12:00 PM
+      - generic [ref=e35] [cursor=pointer]: 01:00 PM
+      - generic [ref=e37] [cursor=pointer]: 02:00 PM
+      - generic [ref=e39] [cursor=pointer]: 03:00 PM
+      - generic [ref=e41] [cursor=pointer]: 04:00 PM
+      - generic [ref=e43] [cursor=pointer]: 05:00 PM
+      - generic [ref=e45] [cursor=pointer]: 06:00 PM
+      - generic [ref=e47] [cursor=pointer]: 07:00 PM
+      - generic [ref=e49] [cursor=pointer]: 08:00 PM
+      - generic [ref=e51] [cursor=pointer]: 09:00 PM
+      - generic [ref=e53] [cursor=pointer]: 10:00 PM
+      - generic [ref=e55] [cursor=pointer]: 11:00 PM
+    - button "Confirm Booking" [ref=e56] [cursor=pointer]
+```
