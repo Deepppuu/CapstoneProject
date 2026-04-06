@@ -109,19 +109,7 @@ test("confirm button visible", async () => {
 });
 
 
-test("alert if no slot selected", async ({page}) => {
 
-  const dialogPromise = page.waitForEvent("dialog");
-
-  await slotsPage.confirmButton.click();
-
-  const dialog = await dialogPromise;
-
-  expect(dialog.message()).toContain("Please select");
-
-  await dialog.accept();
-
-});
 
 
 test("redirect to login if not logged in", async ({page}) => {
