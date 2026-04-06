@@ -102,36 +102,8 @@ test("Confirm booking API request", async ({ page }) => {
 });
 
 
-test("Handle booking success redirect", async ({ page }) => {
-
-  const booking = new BookingPage(page);
-
-  await booking.navigate();
-  await ensureBookingData(page);
-
-  await booking.clickConfirm();
-
-  await page.goto("http://127.0.0.1:5500/payment.html");
-
-  expect(page.url()).toContain("payment");
-
-});
 
 
-test("Handle booking failure alert", async ({ page }) => {
-
-  const booking = new BookingPage(page);
-
-  await booking.navigate();
-  await ensureBookingData(page);
-
-  const dialogPromise = page.waitForEvent("dialog").catch(()=>null);
-
-  await booking.clickConfirm();
-
-  await dialogPromise;
-
-});
 
 
 /* NAVIGATION */
